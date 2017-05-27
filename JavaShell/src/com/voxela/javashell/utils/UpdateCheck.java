@@ -13,7 +13,9 @@ import com.voxela.javashell.JavaShell;
 
 public class UpdateCheck {
 		
-	private static String prefix = "[JavaShell] ";
+	private static final String prefix = "[JavaShell] ";
+	private static final String red = "\u001B[31m";
+	private static final String reset = "\u001B[0m";
 	
 	public static void check() {
 		
@@ -42,12 +44,12 @@ public class UpdateCheck {
 					double behind = (latest - current) * 10;
 					String msg = HttpUtil.requestHttp("http://net.voxela.com/javashell/outdated.html");
 					
-					Bukkit.getServer().getLogger().warning(msg);
-					Bukkit.getServer().getLogger().warning(prefix + "You are " + (int) behind + " version(s) behind.");
+					Bukkit.getServer().getLogger().warning(red + msg + reset);
+					Bukkit.getServer().getLogger().warning(prefix + red + "You are " + (int) behind + " version(s) behind." + reset);
 				}
 				
 			}
-		}.runTaskLater(JavaShell.getInstance(), 100L);
+		}.runTaskLater(JavaShell.getInstance(), 200L);
 		
     }
 
