@@ -5,38 +5,49 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import com.sun.tools.javac.Main;
+import com.voxela.javashell.utils.FileScanner;
 
 /**
- * Created by Ladinn & Zhanger
+ * Created by Ladinn
  *
- * @on 52/26/2017
+ * @on 5/26/2017
  */
 public class Runner {
-
-	public static void runCode(String s) throws Exception {
-
-		JavaCompiler jc = ToolProvider.getSystemJavaCompiler();
-		StandardJavaFileManager sjfm = jc.getStandardFileManager(null, null, null);
-		File jf = new File("run.java"); // create file in current working
-										// directory
-		PrintWriter pw = new PrintWriter(jf);
+	
+	public static void run(String s) throws Exception {
+		
+		File dataFolder = JavaShell.getInstance().getDataFolder();
+		File runtimeFolder = new File(dataFolder + File.separator + "runtime");
+		File javaFile = new File(runtimeFolder + File.separator + "run.java");
+			
+		PrintWriter pw = new PrintWriter(javaFile);
 		pw.println("import org.bukkit.*;");
 		pw.println("public class run {");
 		pw.print("public static void main(){" + s + "}}");
 		pw.close();
-		Iterable<? extends JavaFileObject> fO = sjfm.getJavaFileObjects(jf);
-		if (!jc.getTask(null, sjfm, null, null, null, fO).call()) {
-			throw new Exception("Compilation Failure!");
+		
+		String[] args = new String[] {
+				"-cp", "." + File.pathSeparator + FileScanner.jarScan(),
+				"-d", runtimeFolder.getAbsolutePath() + File.separator,
+				javaFile.getAbsolutePath()
+		};
+		
+		int compileStatus = Main.compile(args);
+		
+		if (compileStatus != 1) {
+			URL[] urls = new URL[] { runtimeFolder.toURI().toURL() };
+			URLClassLoader ucl = new URLClassLoader(urls);
+			Object o = ucl.loadClass("run").newInstance();
+			o.getClass().getMethod("main").invoke(o);
+			ucl.close();
+		} else {
+			throw new Exception("JavaShell compilation failure");			
 		}
-		URL[] urls = new URL[] { new File("").toURI().toURL() };
-		URLClassLoader ucl = new URLClassLoader(urls);
-		Object o = ucl.loadClass("run").newInstance();
-		o.getClass().getMethod("main").invoke(o);
-		ucl.close();
+		
+		javaFile.delete();
+		File classFile = new File(runtimeFolder + File.separator + "run.class");
+		classFile.delete();
 	}
 
 }

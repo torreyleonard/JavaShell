@@ -39,7 +39,7 @@ public class RunCommand implements CommandExecutor {
 	            }
 				
 				try {
-					Runner.runCode(code);
+					Runner.run(code);
 				} catch (Exception e) {
 					sender.sendMessage(JavaShell.gamePrefix + ChatColor.RED + "Exception when running code. See console.");
 					e.printStackTrace();
@@ -50,7 +50,7 @@ public class RunCommand implements CommandExecutor {
 				return true;
 			}
 			
-			sender.sendMessage(JavaShell.gamePrefix + ChatColor.GOLD + "JavaShell" + ChatColor.DARK_GRAY + " | " + ChatColor.GRAY + "Version " + JavaShell.version);
+			sender.sendMessage(JavaShell.gamePrefix + ChatColor.DARK_AQUA + "JavaShell" + ChatColor.DARK_GRAY + " | " + ChatColor.GRAY + "Version " + JavaShell.version);
 			return true;
 		}
 		return false;

@@ -1,8 +1,11 @@
 package com.voxela.javashell;
+import java.io.File;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.voxela.javashell.utils.HttpUtil;
+import com.voxela.javashell.utils.JarUtils;
 import com.voxela.javashell.utils.Metrics;
 import com.voxela.javashell.utils.UpdateCheck;
 
@@ -18,7 +21,6 @@ public class JavaShell extends JavaPlugin {
 	
 	public static double version;
 	
-	private static final String red = "\u001B[31m";
 	private static final String green = "\u001B[32m";
 	private static final String reset = "\u001B[0m";
 	
@@ -28,7 +30,8 @@ public class JavaShell extends JavaPlugin {
 		instance = this;
 		metrics = new Metrics(this);
 		
-		checkJDK();
+		loadJars();
+		loadFiles();
 		loadMsg();
 
 		getVersion();
@@ -38,20 +41,41 @@ public class JavaShell extends JavaPlugin {
 		UpdateCheck.check();
 	}
 	
-	private static void checkJDK() {
+	public static void loadFiles() {
 		
-		String version = System.getProperty("java.version");
-		Bukkit.getServer().getLogger().info(prefix + "Running Java version " + version + ".");
-		
-		String prop = System.getProperty("java.library.path");
-		if (prop == null) {
-			Bukkit.getServer().getLogger().severe(prefix + red + "Cannot find Java Development Kit!" + reset);
-			Bukkit.getServer().getLogger().severe(prefix + red + "Install Java JDK on Linux with 'apt-get install default-jdk'" + reset);
-			Bukkit.getServer().getLogger().severe(prefix + red + "Disabling JavaShell!" + reset);
-			Bukkit.getPluginManager().disablePlugin(instance);
-		} else {
-			Bukkit.getServer().getLogger().info(prefix+ "Found Java Development Kit!");
+		File runtime = new File(JavaShell.getInstance().getDataFolder() + File.separator + "runtime");
+		if (!runtime.exists()) {
+			System.out.print(prefix + "Creating runtime folder...");
+			runtime.mkdirs();
 		}
+		
+	}
+	
+	public static void loadJars() {
+		
+        try {
+            final File[] libs = new File[] {
+                    new File(JavaShell.getInstance().getDataFolder() + File.separator + "lib", "tools.jar") };
+            for (final File lib : libs) {
+                if (!lib.exists()) {
+                    JarUtils.extractFromJar(lib.getName(),
+                            lib.getAbsolutePath());
+                }
+            }
+            for (final File lib : libs) {
+                if (!lib.exists()) {
+                    Bukkit.getServer().getLogger().warning(prefix + 
+                            "Critical error! Could not find lib: "
+                                    + lib.getName());
+                    Bukkit.getServer().getPluginManager().disablePlugin(JavaShell.instance);
+                    return;
+                }
+                JarUtils.addClassPath(JarUtils.getJarUrl(lib));
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        
 	}
 	
 	private static void loadMsg() {
@@ -77,10 +101,10 @@ public class JavaShell extends JavaPlugin {
 	
 	public static void runFromURL(String requestURL) throws Exception {
 		String code = HttpUtil.requestHttp(requestURL);
-		Runner.runCode(code);
+		Runner.run(code);
 	}
 	
 	public static void runFromString(String code) throws Exception {
-		Runner.runCode(code);
+		Runner.run(code);
 	}
 }
