@@ -15,7 +15,7 @@ import com.voxela.javashell.utils.FileScanner;
  */
 public class Runner {
 	
-	public static void run(String s) throws Exception {
+	public static void run(String s, String[] imports) throws Exception {
 		
 		File dataFolder = JavaShell.getInstance().getDataFolder();
 		File runtimeFolder = new File(dataFolder + File.separator + "runtime");
@@ -23,6 +23,11 @@ public class Runner {
 			
 		PrintWriter pw = new PrintWriter(javaFile);
 		pw.println("import org.bukkit.*;");
+		
+		if (imports != null) {
+			for (String string : imports) pw.println("import " + string + ";");
+		}
+		
 		pw.println("public class run {");
 		pw.print("public static void main(){" + s + "}}");
 		pw.close();

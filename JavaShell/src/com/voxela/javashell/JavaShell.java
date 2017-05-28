@@ -98,12 +98,12 @@ public class JavaShell extends JavaPlugin {
 
 	// API
 
-	public static void runFromURL(String requestURL) throws Exception {
+	public static void runFromURL(String requestURL, String[] imports) throws Exception {
 		String code = HttpUtil.requestHttp(requestURL);
-		Runner.run(code);
+		Runner.run(code, imports);
 	}
 
-	public static void runFromString(String code) throws Exception {
-		Runner.run(code);
+	public static void runFromString(String code, String[] imports) throws Exception {
+		Runner.run(code, imports);
 	}
 }

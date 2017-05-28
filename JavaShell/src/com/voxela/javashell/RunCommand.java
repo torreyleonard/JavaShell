@@ -39,7 +39,7 @@ public class RunCommand implements CommandExecutor {
 	            }
 				
 				try {
-					Runner.run(code);
+					Runner.run(code, null);
 				} catch (Exception e) {
 					sender.sendMessage(JavaShell.gamePrefix + ChatColor.RED + "Exception when running code. See console.");
 					e.printStackTrace();

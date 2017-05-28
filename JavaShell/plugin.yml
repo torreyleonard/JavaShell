@@ -1,6 +1,6 @@
 name: JavaShell
 main: com.voxela.javashell.JavaShell
-version: 1.3
+version: 1.4
 author: Ladinn
 website: http://www.voxela.com
 commands:
