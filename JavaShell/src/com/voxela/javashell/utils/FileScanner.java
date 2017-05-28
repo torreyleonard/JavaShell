@@ -9,11 +9,13 @@ import org.bukkit.Bukkit;
 import com.voxela.javashell.JavaShell;
 
 public class FileScanner {
+	
+	public static String paths = "";
 
-	public static String jarScan() {
+	public static Integer jarScan() {
 
-		String paths = "";
-
+		int count = 0;
+		
 		File dataFolder = JavaShell.getInstance().getDataFolder();
 		File pluginsFolder = dataFolder.getParentFile();
 		File serverRoot = Bukkit.getWorldContainer();
@@ -33,8 +35,9 @@ public class FileScanner {
 		for (File file : (File[]) ArrayUtils.addAll(rootJars, pluginJars)) {
 			String path = file.getAbsolutePath();
 			paths += File.pathSeparator + path;
+			count += 1;
 		}
-		return paths;
+		return count;
 	}
 
 }

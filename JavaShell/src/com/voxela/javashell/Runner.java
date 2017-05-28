@@ -28,7 +28,7 @@ public class Runner {
 		pw.close();
 		
 		String[] args = new String[] {
-				"-cp", "." + File.pathSeparator + FileScanner.jarScan(),
+				"-cp", "." + File.pathSeparator + FileScanner.paths,
 				"-d", runtimeFolder.getAbsolutePath() + File.separator,
 				javaFile.getAbsolutePath()
 		};
