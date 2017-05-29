@@ -35,6 +35,10 @@ public class JavaShell extends JavaPlugin {
 		Bukkit.getServer().getLogger().info(prefix + "Running Java version " + version + ".");
 		loadFiles();
 		loadDependencies();
+		int scriptsLoaded = loadScripts();
+		if (scriptsLoaded > 0) {
+			Bukkit.getServer().getLogger().info(prefix + "Downloaded " + scriptsLoaded + " script(s).");
+		}
 		Bukkit.getServer().getLogger().info(prefix + "Loaded " + FileScanner.jarScan() + " plugins and libraries.");
 		loadMsg();
 		this.getCommand("run").setExecutor(new RunCommand(this));
@@ -45,11 +49,10 @@ public class JavaShell extends JavaPlugin {
 	public static void loadFiles() {
 
 		File runtime = new File(JavaShell.getInstance().getDataFolder() + File.separator + "runtime");
-		if (!runtime.exists()) {
-			System.out.print(prefix + "Creating runtime folder...");
-			runtime.mkdirs();
-		}
-
+		File scriptDir = new File(JavaShell.getInstance().getDataFolder() + File.separator + "scripts");
+		
+		if (!runtime.exists()) runtime.mkdirs();
+		if (!scriptDir.exists()) scriptDir.mkdirs();
 	}
 
 	public static void loadDependencies() {
@@ -105,5 +108,26 @@ public class JavaShell extends JavaPlugin {
 
 	public static void runFromString(String code, String[] imports) throws Exception {
 		Runner.run(code, imports);
+	}
+	
+	// Load scripts
+	
+	public static int loadScripts() {
+		
+		int count = 0;
+		
+		File scriptDir = new File(JavaShell.getInstance().getDataFolder() + File.separator + "scripts");
+		
+		String string = HttpUtil.requestHttp("https://raw.githubusercontent.com/Ladinn/JavaShell/master/Scripts/scripts.yml");
+		string = string.replace("\n", "").replace("\r", "");
+		String[] parts = string.split(":");
+		
+		for (String script : parts) {
+			File scriptFile = new File(scriptDir + File.separator + script + ".java");
+			if (scriptFile.exists()) continue;
+			HttpUtil.downloadFile("https://raw.githubusercontent.com/Ladinn/JavaShell/master/Scripts/" + script + ".java", scriptFile);
+			count += 1;
+		}
+		return count;
 	}
 }

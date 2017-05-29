@@ -1,9 +1,12 @@
 name: JavaShell
 main: com.voxela.javashell.JavaShell
-version: 1.4
+version: 1.5
 author: Ladinn
 website: http://www.voxela.com
 commands:
     run:
         description: Main command.
         usage: /<command>
+permissions:
+   voxela.javashell:
+     description: Permission to run JavaShell commands.
